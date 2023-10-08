@@ -44,15 +44,12 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).primaryColor,
           elevation: 0,
-          title: const Wrap(
-            spacing: 12,
-            children: [
-              Text(
-                'Dispatch',
-                style: TextStyles.logoMedium,
-              ),
-              Icon(Icons.messenger, size: 24),
-            ],
+          title: const Padding(
+            padding: EdgeInsets.only(left: 84),
+            child: Text(
+              'Dispatch',
+              style: TextStyles.logoMedium,
+            ),
           ),
         ),
         drawer: const _DrawerPage(),

@@ -9,8 +9,8 @@ class ChatDTO {
   @JsonKey(name: 'chat_id')
   final String id;
 
-  @JsonKey(name: 'name')
-  final String name;
+  @JsonKey(name: 'title')
+  final String title;
 
   @JsonKey(name: 'image_path')
   final String? imagePath;
@@ -26,7 +26,7 @@ class ChatDTO {
 
   const ChatDTO({
     required this.id,
-    required this.name,
+    required this.title,
     required this.imagePath,
     required this.participants,
     required this.lastMessage,

@@ -169,11 +169,9 @@ class _AppView extends StatelessWidget {
       ),
       home: BlocBuilder<UserAuthenticationBloc, UserAuthenticationState>(
         buildWhen: (oldState, newState) => (oldState.status != newState.status),
-        builder: (context, state) {
-          return state.status.isAuthenticated && state.user != null
-              ? const HomePage()
-              : const AuthenticationPage();
-        },
+        builder: (context, state) => (state.status.isAuthenticated && state.user != null)
+            ? const HomePage()
+            : const AuthenticationPage(),
       ),
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == ChatPage.path) {

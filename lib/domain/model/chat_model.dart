@@ -12,7 +12,7 @@ enum ChatType {
 class ChatModel extends Equatable {
   const ChatModel({
     required this.id,
-    required this.name,
+    required this.title,
     this.imagePath,
     required this.type,
     required this.participants,
@@ -21,7 +21,7 @@ class ChatModel extends Equatable {
   });
 
   final String id;
-  final String name;
+  final String title;
   final String? imagePath;
   final ChatType type;
   final List<UserModel> participants;
@@ -30,7 +30,7 @@ class ChatModel extends Equatable {
 
   ChatModel copyWith({
     String? id,
-    String? name,
+    String? title,
     String? imagePath,
     ChatType? type,
     List<UserModel>? participants,
@@ -39,7 +39,7 @@ class ChatModel extends Equatable {
   }) {
     return ChatModel(
       id: id ?? this.id,
-      name: name ?? this.name,
+      title: title ?? this.title,
       imagePath: imagePath ?? this.imagePath,
       type: type ?? this.type,
       participants: participants ?? this.participants,
@@ -51,7 +51,7 @@ class ChatModel extends Equatable {
   @override
   List<Object?> get props => [
         id,
-        name,
+        title,
         imagePath,
         type,
         participants,

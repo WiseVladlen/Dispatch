@@ -21,7 +21,7 @@ class ChatTile extends StatelessWidget {
         imagePath: chat.imagePath ?? '',
         radius: 28,
         errorWidget: () => Text(
-          chat.lastMessage.sender.name[0].toUpperCase(),
+          chat.title[0].toUpperCase(),
           style: TextStyles.displayLargeLight,
         ),
         placeholderColor: Colors.green,
@@ -30,7 +30,7 @@ class ChatTile extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              chat.lastMessage.sender.name,
+              chat.title,
               style: Theme.of(context).textTheme.titleLarge,
               overflow: TextOverflow.ellipsis,
             ),
@@ -56,7 +56,7 @@ class ChatTile extends StatelessWidget {
                       ),
                   },
                 Text(
-                  chat.lastMessage.dispatchTime.toLastOnlineTime(),
+                  chat.lastMessage.dispatchTime.toTimeOfDay(),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -64,7 +64,6 @@ class ChatTile extends StatelessWidget {
           ),
         ],
       ),
-      isThreeLine: true,
       subtitle: Padding(
         padding: const EdgeInsets.only(top: 6),
         child: Row(

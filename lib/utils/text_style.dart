@@ -43,12 +43,19 @@ class TextStyles {
   /// Style of the unread messages indicator
   static const TextStyle unreadMessageCountIndicator = TextStyle(
     color: Colors.white,
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: FontWeight.bold,
   );
 
   /// Header style for unread messages
   static const TextStyle unreadMessageTitle = TextStyle(
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+  );
+
+  /// Header style for date of year
+  static const TextStyle dateOfYearTitle = TextStyle(
     color: Colors.white,
     fontSize: 14,
     fontWeight: FontWeight.bold,

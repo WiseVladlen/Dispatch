@@ -6,6 +6,19 @@ part of 'user_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+ShortUserDTO _$ShortUserDTOFromJson(Map<String, dynamic> json) => ShortUserDTO(
+      email: json['email'] as String,
+      name: json['name'] as String,
+      imagePath: json['image_path'] as String?,
+    );
+
+Map<String, dynamic> _$ShortUserDTOToJson(ShortUserDTO instance) =>
+    <String, dynamic>{
+      'email': instance.email,
+      'name': instance.name,
+      'image_path': instance.imagePath,
+    };
+
 UserDTO _$UserDTOFromJson(Map<String, dynamic> json) => UserDTO(
       email: json['email'] as String,
       name: json['name'] as String,
@@ -17,9 +30,9 @@ UserDTO _$UserDTOFromJson(Map<String, dynamic> json) => UserDTO(
 Map<String, dynamic> _$UserDTOToJson(UserDTO instance) => <String, dynamic>{
       'email': instance.email,
       'name': instance.name,
+      'image_path': instance.imagePath,
       'is_online': instance.isOnline,
       'last_time_online': instance.lastTimeOnline,
-      'image_path': instance.imagePath,
     };
 
 AuthenticatedUserDTO _$AuthenticatedUserDTOFromJson(

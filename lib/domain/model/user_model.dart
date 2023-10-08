@@ -1,19 +1,31 @@
 import 'package:equatable/equatable.dart';
 
-class UserModel extends Equatable {
-  const UserModel({
+class ShortUserModel extends Equatable {
+  final String email;
+  final String name;
+  final String? imagePath;
+
+  const ShortUserModel({
     required this.email,
     required this.name,
-    required this.isOnline,
-    required this.lastTimeOnline,
     this.imagePath,
   });
 
-  final String email;
-  final String name;
+  @override
+  List<Object?> get props => [email, name, imagePath];
+}
+
+class UserModel extends ShortUserModel {
+  const UserModel({
+    required super.email,
+    required super.name,
+    required this.isOnline,
+    required this.lastTimeOnline,
+    super.imagePath,
+  });
+
   final bool isOnline;
   final DateTime lastTimeOnline;
-  final String? imagePath;
 
   UserModel copyWith({
     String? email,

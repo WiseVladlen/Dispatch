@@ -8,7 +8,7 @@ part of 'chat_dto.dart';
 
 ChatDTO _$ChatDTOFromJson(Map<String, dynamic> json) => ChatDTO(
       id: json['chat_id'] as String,
-      name: json['name'] as String,
+      title: json['title'] as String,
       imagePath: json['image_path'] as String?,
       participants: (json['participants'] as List<dynamic>)
           .map((e) => UserDTO.fromJson(e as Map<String, dynamic>))
@@ -20,7 +20,7 @@ ChatDTO _$ChatDTOFromJson(Map<String, dynamic> json) => ChatDTO(
 
 Map<String, dynamic> _$ChatDTOToJson(ChatDTO instance) => <String, dynamic>{
       'chat_id': instance.id,
-      'name': instance.name,
+      'title': instance.title,
       'image_path': instance.imagePath,
       'participants': instance.participants.map((e) => e.toJson()).toList(),
       'last_message': instance.lastMessage.toJson(),

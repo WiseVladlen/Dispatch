@@ -29,7 +29,7 @@ class ChatViewModel {
   static ChatViewModel fromChatModel(ChatModel model) {
     return ChatViewModel(
       id: model.id,
-      title: model.name,
+      title: model.title,
       subtitle: model.participants.first.lastTimeOnline.toLastOnlineTime(),
       imagePath: model.imagePath,
     );

@@ -32,7 +32,7 @@ class UserRemoteDataSource {
   Future<void> updateOnlineStatus({required bool isOnline}) async {
     final uri = DioService.buildUri(path: 'users/update-online-status');
     await DioService.cookieJar.loadForRequest(uri);
-    // await DioService.dio.postUri(uri, data: isOnline);
+    await DioService.dio.postUri(uri, data: {'online_status': isOnline});
   }
 
   /// Updates the image of the current user to [imageFile].

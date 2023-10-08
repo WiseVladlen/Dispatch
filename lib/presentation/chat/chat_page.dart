@@ -7,6 +7,7 @@ import 'package:dispatch/presentation/chat/bloc/chat_event.dart';
 import 'package:dispatch/presentation/chat/bloc/chat_state.dart';
 import 'package:dispatch/presentation/chat/message_tile.dart';
 import 'package:dispatch/presentation/chat/view_model/chat_view_model.dart';
+import 'package:dispatch/utils/date_utils.dart';
 import 'package:dispatch/utils/delayed_action.dart';
 import 'package:dispatch/utils/message_list_utils.dart';
 import 'package:dispatch/utils/text_style.dart';
@@ -94,42 +95,42 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
                 child: BlocBuilder<ChatBloc, ChatState>(
                   buildWhen: (oldState, newState) => (oldState.messages != newState.messages),
                   builder: (context, state) {
-                    final messageList = state.messages;
+                    final messages = state.messages;
                     final user = context.read<UserCubit>().state.user;
 
-                    if (messageList == null) {
+                    if (messages == null) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (messageList.isEmpty) {
+                    if (messages.isEmpty) {
                       return const Center(child: Text('No messages here yet'));
                     }
 
                     _animationController.forward();
 
                     SchedulerBinding.instance.addPostFrameCallback((_) {
-                      final (index, message) = messageList.firstIndexedUnreadMessage(
+                      final (index, message) = messages.firstIndexedUnreadMessage(
                         email: user.email,
                         orElse: () => (-1, null),
                       );
 
                       if (message == null) {
                         initialUnreadMessageId = null;
-                        scrollTo(messageList.length, alignment: 0.8);
+                        scrollTo(0, alignment: 0);
                         return;
                       }
 
                       initialUnreadMessageId = message.id;
 
-                      scrollTo(index + 1);
+                      scrollTo(index - 1);
                     });
 
                     return FadeTransition(
                       opacity: _animation,
                       child: ScrollablePositionedList.separated(
-                        itemCount: messageList.length,
+                        itemCount: messages.length,
                         itemBuilder: (context, index) {
-                          final message = messageList[index];
+                          final message = messages[index];
 
                           Widget buildMessageTile({Key? key, required bool isSentByMe}) {
                             return MessageTile(
@@ -146,6 +147,7 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
                               onVisibilityChanged: (info) {
                                 if (info.visibleFraction == 1) {
                                   context.read<ChatBloc>().add(QueueMessageForReading(message.id));
+
                                   DelayedAction.run(() {
                                     context.read<ChatBloc>().add(ReadMessages());
                                   });
@@ -160,24 +162,24 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
                           );
                         },
                         separatorBuilder: (context, index) {
-                          if (messageList[index].id == initialUnreadMessageId) {
-                            return Container(
-                              color: Theme.of(context).primaryColor.withOpacity(0.75),
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: const Text(
-                                'Unread messages',
-                                style: TextStyles.unreadMessageTitle,
-                              ),
-                            );
+                          if (messages[index].id == initialUnreadMessageId) {
+                            return const _UnreadMessageSeparator();
                           }
+
+                          late final isDaysEqual = messages[index - 1]
+                              .dispatchTime
+                              .equalsDay(messages[index].dispatchTime);
+
+                          if (index != 0 && !isDaysEqual) {
+                            return _DateOfYearSeparator(date: messages[index].dispatchTime);
+                          }
+
                           return const Divider(height: 0, color: Colors.transparent);
                         },
+                        reverse: true,
                         itemScrollController: _itemScrollController,
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                     );
                   },
@@ -206,6 +208,49 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
   }
 }
 
+@immutable
+class _UnreadMessageSeparator extends StatelessWidget {
+  const _UnreadMessageSeparator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).primaryColor.withOpacity(0.75),
+      width: double.maxFinite,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: const Text(
+        'Unread messages',
+        style: TextStyles.unreadMessageTitle,
+      ),
+    );
+  }
+}
+
+@immutable
+class _DateOfYearSeparator extends StatelessWidget {
+  const _DateOfYearSeparator({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.blue[300],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        date.toDateOfYear(),
+        style: TextStyles.dateOfYearTitle,
+      ),
+    );
+  }
+}
+
 class _MessageInput extends StatelessWidget {
   const _MessageInput();
 
@@ -216,17 +261,23 @@ class _MessageInput extends StatelessWidget {
       children: [
         const IconButton(icon: Icon(Icons.lock), onPressed: null),
         Expanded(
-          child: TextField(
-            key: const Key('chatPage_messageInput_textFiled'),
-            onChanged: (value) => context.read<ChatBloc>().add(EditTypedMessage(value)),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Message',
-            ),
-            textAlignVertical: TextAlignVertical.center,
-            keyboardType: TextInputType.multiline,
-            minLines: 1,
-            maxLines: 7,
+          child: BlocBuilder<ChatBloc, ChatState>(
+            buildWhen: (oldState, newState) => newState.textFieldIsCleared,
+            builder: (context, state) {
+              return TextField(
+                key: const Key('chatPage_messageInput_textFiled'),
+                controller: TextEditingController()..text = state.typedMessage.value,
+                onChanged: (value) => context.read<ChatBloc>().add(EditTypedMessage(value)),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Message',
+                ),
+                textAlignVertical: TextAlignVertical.center,
+                keyboardType: TextInputType.multiline,
+                minLines: 1,
+                maxLines: 7,
+              );
+            },
           ),
         ),
         BlocBuilder<ChatBloc, ChatState>(

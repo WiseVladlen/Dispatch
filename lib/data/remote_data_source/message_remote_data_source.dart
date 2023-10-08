@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:dispatch/data/dto/chat_dto.dart';
 import 'package:dispatch/data/dto/message_dto.dart';
 import 'package:dispatch/data/http_service/dio_service.dart';
 import 'package:dispatch/data/http_service/stomp_service.dart';
+import 'package:dispatch/data/mapper/chat_mapper.dart';
 import 'package:dispatch/data/mapper/message_mapper.dart';
+import 'package:dispatch/domain/model/chat_model.dart';
 import 'package:dispatch/domain/model/message_model.dart';
 import 'package:dispatch/utils/object_utils.dart';
 
@@ -28,28 +31,26 @@ class MessageRemoteDataSource {
   ///
   /// The [page] parameter defines the current data page,
   /// and [pageSize] determines the size of the requested page.
-  Future<List<ShortMessageModel>> getMessages(
+  Future<ChatMessagesModel> getChatMessages(
     String chatId, {
     int page = 0,
     int pageSize = 0,
   }) async {
-    final queryParameters = <String, int>{
+    final queryParameters = <String, dynamic>{
       'page': page,
       'page-size': pageSize,
     };
     final uri = DioService.buildUri(
       path: 'chats/$chatId/messages',
-      queryParameters: queryParameters,
+      queryParameters: queryParameters.map((key, value) => MapEntry(key, value.toString())),
     );
 
     await DioService.cookieJar.loadForRequest(uri);
     final response = await DioService.dio.setHeaders().getUri(uri);
-    return (response.data as List<dynamic>)
-        .map((e) => ShortMessageDTO.fromJson(e).toShortMessageModel())
-        .toList();
+    return ChatMessagesDTO.fromJson((response.data as Map<String, dynamic>)).toChatMessagesModel();
   }
 
-  /// Sends the [content] message to the user's current chat according to the [chatId] parameter.
+  /// Sends the [messageContent] message to the user's current chat according to the [chatId] parameter.
   void sendMessage({required SendMessageRequestModel messageRequestModel}) {
     stompService.client.send(
       headers: {Headers.contentTypeHeader: Headers.jsonContentType},

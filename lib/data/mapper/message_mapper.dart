@@ -1,6 +1,8 @@
 import 'package:dispatch/data/dto/message_dto.dart';
+import 'package:dispatch/data/dto/user_dto.dart';
 import 'package:dispatch/data/mapper/user_mapper.dart';
 import 'package:dispatch/domain/model/message_model.dart';
+import 'package:dispatch/domain/model/user_model.dart';
 
 extension MessageStatusToMessageStatusDTOMapper on MessageStatus {
   MessageStatusDTO toMessageStatusDTO() {
@@ -27,9 +29,9 @@ extension MessageDTOToShortMessageModelMapper on ShortMessageDTO {
     return ShortMessageModel(
       id: id,
       content: content.toMessageContent(),
-      dispatchTime: DateTime.fromMillisecondsSinceEpoch(dispatchTime),
+      dispatchTime: DateTime.fromMillisecondsSinceEpoch(dispatchTime, isUtc: true),
       status: status.toMessageStatus(),
-      sender: sender.toUserModel(),
+      sender: sender.toShortUserModel(),
     );
   }
 }
@@ -39,9 +41,9 @@ extension MessageDTOToStandardMessageModelMapper on StandardMessageDTO {
     return StandardMessageModel(
       id: id,
       content: content.toMessageContent(),
-      dispatchTime: DateTime.fromMillisecondsSinceEpoch(dispatchTime),
+      dispatchTime: DateTime.fromMillisecondsSinceEpoch(dispatchTime, isUtc: true),
       status: status.toMessageStatus(),
-      sender: sender.toUserModel(),
+      sender: (sender as UserDTO).toUserModel(),
       chatId: chatId,
     );
   }
@@ -54,7 +56,7 @@ extension MessageModelToStandardMessageDTOMapper on StandardMessageModel {
       content: content.toMessageContentDTO(),
       dispatchTime: dispatchTime.millisecondsSinceEpoch,
       status: status.toMessageStatusDTO(),
-      sender: sender.toUserDTO(),
+      sender: (sender as UserModel).toUserDTO(),
       chatId: chatId,
     );
   }
@@ -64,7 +66,14 @@ extension SendMessageRequestModelToSendMessageRequestDTO on SendMessageRequestMo
   SendMessageRequestDTO toSendMessageRequestDTO() {
     return SendMessageRequestDTO(
       chatId: chatId,
-      content: content.toMessageContentDTO(),
+      messageContent: messageContent,
     );
   }
+}
+
+extension SendMessageRequestDTOToJson on SendMessageRequestDTO {
+  Map<String, dynamic> toJson() => {
+        'chat_id': chatId,
+        'message_content': messageContent,
+      };
 }

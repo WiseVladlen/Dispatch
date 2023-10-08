@@ -29,7 +29,7 @@ Future<void> saveCookieFromResponse(Uri uri, Response<dynamic> response) async {
   });
 }
 
-void deleteCookies() => DioService.cookieJar.deleteAll();
+Future<void> deleteCookies() => DioService.cookieJar.deleteAll();
 
 Future<void> prepareCookieJar() async {
   final appDocDir = await getApplicationDocumentsDirectory();

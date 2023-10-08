@@ -16,6 +16,7 @@ class AuthenticationErrorHandler {
 
     await DioService.cookieJar.loadForRequest(uri);
     final response = await DioService.dio.getUri(uri);
+    await deleteCookies();
     await saveCookieFromResponse(uri, response);
 
     final authenticatedUser = AuthenticatedUserDTO.fromJson(response.data);

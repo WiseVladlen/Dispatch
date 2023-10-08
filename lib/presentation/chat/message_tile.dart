@@ -18,9 +18,9 @@ class MessageTile extends StatelessWidget {
     final double rightContainerPadding = isSentByMe ? 6 : 12;
 
     final double leftContainerMargin = isSentByMe ? 72 : 8;
-    const double topContainerMargin = 6;
+    const double topContainerMargin = 4;
     final double rightContainerMargin = isSentByMe ? 8 : 72;
-    const double bottomContainerMargin = 6;
+    const double bottomContainerMargin = 4;
 
     final containerAlignment = isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start;
 
@@ -64,7 +64,7 @@ class MessageTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        message.dispatchTime.toLastOnlineTime(),
+                        message.dispatchTime.toTimeOfDay(),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       if (isSentByMe)

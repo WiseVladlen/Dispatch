@@ -33,15 +33,14 @@ final class ShortMessageModel extends Equatable {
   final MessageContent content;
   final DateTime dispatchTime;
   final MessageStatus status;
-  final UserModel sender;
+  final ShortUserModel sender;
 
   ShortMessageModel copyWith({
     String? id,
     MessageContent? content,
     DateTime? dispatchTime,
     MessageStatus? status,
-    UserModel? sender,
-    String? chatId,
+    ShortUserModel? sender,
   }) {
     return ShortMessageModel(
       id: id ?? this.id,
@@ -74,7 +73,7 @@ final class StandardMessageModel extends ShortMessageModel {
     MessageContent? content,
     DateTime? dispatchTime,
     MessageStatus? status,
-    UserModel? sender,
+    ShortUserModel? sender,
     String? chatId,
   }) {
     return StandardMessageModel(
@@ -94,9 +93,9 @@ final class StandardMessageModel extends ShortMessageModel {
 final class SendMessageRequestModel {
   const SendMessageRequestModel({
     required this.chatId,
-    required this.content,
+    required this.messageContent,
   });
 
   final String chatId;
-  final MessageContent content;
+  final String messageContent;
 }

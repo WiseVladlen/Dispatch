@@ -40,7 +40,7 @@ class ShortMessageDTO {
   final MessageStatusDTO status;
 
   @JsonKey(name: 'sender')
-  final UserDTO sender;
+  final ShortUserDTO sender;
 
   const ShortMessageDTO({
     required this.id,
@@ -76,21 +76,12 @@ class StandardMessageDTO extends ShortMessageDTO {
   Map<String, dynamic> toJson() => _$StandardMessageDTOToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true)
 final class SendMessageRequestDTO {
-  @JsonKey(name: 'chat_id')
   final String chatId;
-
-  @JsonKey(name: 'message_content')
-  final MessageContentDTO content;
+  final String messageContent;
 
   const SendMessageRequestDTO({
     required this.chatId,
-    required this.content,
+    required this.messageContent,
   });
-
-  factory SendMessageRequestDTO.fromJson(Map<String, dynamic> json) =>
-      _$SendMessageRequestDTOFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SendMessageRequestDTOToJson(this);
 }

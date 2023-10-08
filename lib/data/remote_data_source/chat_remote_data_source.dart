@@ -1,6 +1,6 @@
 import 'package:dispatch/data/dto/chat_dto.dart';
-import 'package:dispatch/data/mapper/chat_mapper.dart';
 import 'package:dispatch/data/http_service/dio_service.dart';
+import 'package:dispatch/data/mapper/chat_mapper.dart';
 import 'package:dispatch/domain/model/chat_model.dart';
 
 class ChatRemoteDataSource {
@@ -30,6 +30,8 @@ class ChatRemoteDataSource {
     final uri = DioService.buildUri(path: 'chats');
     await DioService.cookieJar.loadForRequest(uri);
     final response = await DioService.dio.setHeaders().getUri(uri);
-    return (response.data as List<dynamic>).map((e) => ChatDTO.fromJson(e).toChatModel()).toList();
+    return (response.data as List<dynamic>)
+        .map((e) => ChatDTO.fromJson(e as Map<String, dynamic>).toChatModel())
+        .toList();
   }
 }

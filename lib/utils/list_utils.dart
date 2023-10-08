@@ -18,7 +18,7 @@ extension ListExtension<E> on List<E> {
   }
 
   /// Iterates through the elements in search of the first element with the status [MessageStatus.sent],
-  /// that satisfies the parameters [email] and [content].
+  /// that satisfies the parameters [email] and [messageContent].
   ///
   /// If such an element is found, it is map according to the [toElement] function,
   /// otherwise the [orElse] function is executed.

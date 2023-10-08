@@ -42,8 +42,6 @@ class ChooseChatPage extends StatelessWidget {
                 builder: (context, data) {
                   late final users = data.data;
 
-                  print('users is $users');
-
                   if (!data.connectionState.isNone && !data.connectionState.isDone) {
                     return const Center(child: CircularProgressIndicator());
                   }

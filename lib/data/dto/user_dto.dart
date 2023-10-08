@@ -3,32 +3,46 @@ import 'package:json_annotation/json_annotation.dart';
 part 'user_dto.g.dart';
 
 @JsonSerializable()
-class UserDTO {
+class ShortUserDTO {
   @JsonKey(name: 'email')
   final String email;
 
   @JsonKey(name: 'name')
   final String name;
 
+  @JsonKey(name: 'image_path')
+  final String? imagePath;
+
+  const ShortUserDTO({
+    required this.email,
+    required this.name,
+    this.imagePath,
+  });
+
+  factory ShortUserDTO.fromJson(Map<String, dynamic> json) => _$ShortUserDTOFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ShortUserDTOToJson(this);
+}
+
+@JsonSerializable()
+class UserDTO extends ShortUserDTO {
   @JsonKey(name: 'is_online')
   final bool isOnline;
 
   @JsonKey(name: 'last_time_online')
   final int lastTimeOnline;
 
-  @JsonKey(name: 'image_path')
-  final String? imagePath;
-
   const UserDTO({
-    required this.email,
-    required this.name,
+    required super.email,
+    required super.name,
     required this.isOnline,
     required this.lastTimeOnline,
-    this.imagePath,
+    super.imagePath,
   });
 
   factory UserDTO.fromJson(Map<String, dynamic> json) => _$UserDTOFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$UserDTOToJson(this);
 }
 

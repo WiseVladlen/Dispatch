@@ -17,8 +17,11 @@ class ErrorInterceptor extends Interceptor {
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 403) {
       try {
-        // await authenticationErrorHandler.refreshTokens();
+        await authenticationErrorHandler.refreshTokens();
+
+        await DioService.cookieJar.loadForRequest(err.requestOptions.uri);
         final response = await DioService.dio.fetch(err.requestOptions);
+
         handler.resolve(response);
       } on DioException catch (e) {
         handler.reject(e);

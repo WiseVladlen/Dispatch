@@ -7,7 +7,7 @@ extension ChatDTOToChatModelMapper on ChatDTO {
   ChatModel toChatModel() {
     return ChatModel(
       id: id,
-      name: name,
+      title: title,
       imagePath: imagePath,
       type: ChatType.oneOnOne,
       participants: participants.map((e) => e.toUserModel()).toList(),

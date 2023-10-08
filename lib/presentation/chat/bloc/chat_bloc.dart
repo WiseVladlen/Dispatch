@@ -50,18 +50,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final IMessageRepository messageRepository;
 
   void _loadMessageList(LoadMessageListEvent event, Emitter<ChatState> emit) async {
-    chatId.safeLet((it) async {
-      emit(state.copyWith(
-        messages: await messageRepository.getMessages(
-          it,
-          page: 0,
-          pageSize: 100,
-        ),
-      ));
+    await chatId.safeLet((it) async {
+      final chatMessages = await messageRepository.getChatMessages(it, page: 0, pageSize: 100);
+      emit(state.copyWith(messages: chatMessages.messages.reversed.toList()));
     });
   }
 
-  void _sendTypedMessage(SendTypedMessageEvent event, Emitter<ChatState> emit) {
+  Future<void> _sendTypedMessage(SendTypedMessageEvent event, Emitter<ChatState> emit) async {
     final message = ShortMessageModel(
       id: const Uuid().v1(),
       content: MessageContent(text: state.typedMessage.value.trim()),
@@ -70,22 +65,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       sender: sender,
     );
 
-    Future.microtask(() {
-      email.safeLet((it) async {
-        messageRepository.sendMessage(
-          SendMessageRequestModel(
-            chatId: chatId ??= await chatRepository.createChat(participants: [it]),
-            content: message.content,
+    Future.microtask(() async {
+      messageRepository.sendMessage(
+        SendMessageRequestModel(
+          chatId: chatId ??= await chatRepository.createChat(
+            participants: [email ?? proxyUser.email],
           ),
-        );
-      });
+          messageContent: message.content.text,
+        ),
+      );
     });
 
     emit(state.copyWith(
+      typedMessage: const Message.pure(),
       isValid: false,
-      changeMessage: true,
-      messages: (state.messages ?? [])..add(message),
-      //messages: List.of(state.messages ?? [])..add(message),
+      textFieldIsCleared: true,
+      messages: [message, ...?state.messages],
     ));
   }
 
@@ -93,7 +88,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Message.dirty(event.text).let((it) {
       emit(state.copyWith(
         typedMessage: it,
-        changeMessage: true,
         isValid: Formz.validate([it]),
       ));
     });
@@ -122,7 +116,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         email: sender.email,
         content: event.message.content,
         toElement: (e) => e.copyWith(status: event.message.status),
-        orElse: (list) => list..add(event.message),
+        orElse: (list) => [event.message, ...list],
       ),
     ));
   }

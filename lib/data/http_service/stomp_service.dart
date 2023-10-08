@@ -28,8 +28,34 @@ class StompService {
       config: StompConfig.sockJS(
         url: Uri(scheme: scheme, host: host, port: port, path: path).toString(),
         stompConnectHeaders: HttpHeaders.build(contentType: Headers.jsonContentType),
-        onConnect: (_) => onConnect(),
-        onDisconnect: (_) => onDisconnect(),
+        //onConnect: (_) => onConnect(),
+        //onDisconnect: (_) => onDisconnect(),
+        onConnect: (frame) {
+          print('A stomp on connect :: ${frame.toString()}');
+          onConnect();
+        },
+        onDisconnect: (frame) {
+          print('A stomp on disconnect :: ${frame.toString()}');
+          onDisconnect();
+        },
+        onStompError: (frame) {
+          print('A stomp error occurred in web socket connection :: ${frame.toString()}');
+        },
+        onWebSocketError: (dynamic frame) {
+          print('A Web socket error occurred in web socket connection :: ${frame.toString()}');
+        },
+        onWebSocketDone: () {
+          print('WebSocket - onWebSocketDone executed!');
+        },
+        onUnhandledFrame: (frame) {
+          print('WebSocket - onUnhandledFrame executed! ${frame.toString()}');
+        },
+        onUnhandledMessage: (frame) {
+          print('WebSocket - onUnhandledMessage executed! ${frame.toString()}');
+        },
+        onUnhandledReceipt: (frame) {
+          print('WebSocket - onUnhandledReceipt executed! ${frame.toString()}');
+        },
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:dispatch/data/remote_data_source/message_remote_data_source.dart';
+import 'package:dispatch/domain/model/chat_model.dart';
 import 'package:dispatch/domain/model/message_model.dart';
 import 'package:dispatch/domain/repository/message_repository.dart';
 
@@ -16,12 +17,12 @@ class MessageRepository implements IMessageRepository {
   }
 
   @override
-  Future<List<ShortMessageModel>> getMessages(
+  Future<ChatMessagesModel> getChatMessages(
     String chatId, {
     int page = 0,
     int pageSize = 0,
   }) async {
-    return remoteDataSource.getMessages(chatId, page: page, pageSize: pageSize);
+    return remoteDataSource.getChatMessages(chatId, page: page, pageSize: pageSize);
   }
 
   @override

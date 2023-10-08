@@ -1,6 +1,14 @@
 import 'package:intl/intl.dart';
 
 extension TimeExtension on DateTime {
+  String toTimeOfDay() => DateFormat('HH:mm').format(this);
+
+  String toDateOfYear() {
+    var dateFormat = 'd MMMM';
+    if (year != DateTime.now().year) dateFormat += ', yyyy';
+    return DateFormat(dateFormat).format(this);
+  }
+
   String toLastOnlineTime() {
     final now = DateTime.now();
     final difference = now.difference(this);
@@ -28,4 +36,6 @@ extension TimeExtension on DateTime {
       return 'offline for a long time';
     }
   }
+
+  bool equalsDay(DateTime date) => day == date.day;
 }

@@ -12,9 +12,9 @@ class UserLocalDataSource {
     await db.into(db.userTable).insert(user.toDatabaseUser(), mode: InsertMode.replace);
   }
 
-  /// Returns the first authenticated user in the list in the record format (user, accessToken).
+  /// Returns the first authenticated user.
   ///
-  /// If the user is not found, it returns a null record.
+  /// If the user is not found, it returns a null.
   Future<AuthenticatedUserModel?> getAuthenticatedUser() async {
     final result = db.select(db.userTable)..where((table) => table.accessToken.isNotNull());
     return (await result.getSingleOrNull())?.toAuthenticatedUserModel();

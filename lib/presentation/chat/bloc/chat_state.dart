@@ -5,27 +5,30 @@ import 'package:equatable/equatable.dart';
 class ChatState extends Equatable {
   final Message typedMessage;
   final bool isValid;
+  final bool textFieldIsCleared;
   final List<ShortMessageModel>? messages;
 
   const ChatState({
     this.typedMessage = const Message.pure(),
     this.isValid = false,
+    this.textFieldIsCleared = false,
     this.messages,
   });
 
   ChatState copyWith({
-    Message typedMessage = const Message.pure(),
+    Message? typedMessage,
     bool? isValid,
-    bool changeMessage = false,
+    bool textFieldIsCleared = false,
     List<ShortMessageModel>? messages,
   }) {
     return ChatState(
-      typedMessage: changeMessage ? typedMessage : this.typedMessage,
+      typedMessage: typedMessage ?? this.typedMessage,
       isValid: isValid ?? this.isValid,
+      textFieldIsCleared: textFieldIsCleared,
       messages: messages ?? this.messages,
     );
   }
 
   @override
-  List<Object?> get props => [typedMessage, isValid, messages];
+  List<Object?> get props => [typedMessage, isValid, textFieldIsCleared, messages];
 }

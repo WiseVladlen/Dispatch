@@ -23,7 +23,7 @@ ShortMessageDTO _$ShortMessageDTOFromJson(Map<String, dynamic> json) =>
           json['message_content'] as Map<String, dynamic>),
       dispatchTime: json['dispatch_time'] as int,
       status: $enumDecode(_$MessageStatusDTOEnumMap, json['status']),
-      sender: UserDTO.fromJson(json['sender'] as Map<String, dynamic>),
+      sender: ShortUserDTO.fromJson(json['sender'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ShortMessageDTOToJson(ShortMessageDTO instance) =>
@@ -47,7 +47,7 @@ StandardMessageDTO _$StandardMessageDTOFromJson(Map<String, dynamic> json) =>
           json['message_content'] as Map<String, dynamic>),
       dispatchTime: json['dispatch_time'] as int,
       status: $enumDecode(_$MessageStatusDTOEnumMap, json['status']),
-      sender: UserDTO.fromJson(json['sender'] as Map<String, dynamic>),
+      sender: ShortUserDTO.fromJson(json['sender'] as Map<String, dynamic>),
       chatId: json['chat_id'] as String,
     );
 
@@ -59,19 +59,4 @@ Map<String, dynamic> _$StandardMessageDTOToJson(StandardMessageDTO instance) =>
       'status': _$MessageStatusDTOEnumMap[instance.status]!,
       'sender': instance.sender.toJson(),
       'chat_id': instance.chatId,
-    };
-
-SendMessageRequestDTO _$SendMessageRequestDTOFromJson(
-        Map<String, dynamic> json) =>
-    SendMessageRequestDTO(
-      chatId: json['chat_id'] as String,
-      content: MessageContentDTO.fromJson(
-          json['message_content'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$SendMessageRequestDTOToJson(
-        SendMessageRequestDTO instance) =>
-    <String, dynamic>{
-      'chat_id': instance.chatId,
-      'message_content': instance.content.toJson(),
     };

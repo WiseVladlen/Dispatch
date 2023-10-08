@@ -44,6 +44,16 @@ extension AuthenticatedUserModelToUserTableMapper on AuthenticatedUserModel {
   }
 }
 
+extension ShortUserDTOToShortUserModelMapper on ShortUserDTO {
+  ShortUserModel toShortUserModel() {
+    return ShortUserModel(
+      email: email,
+      name: name,
+      imagePath: imagePath,
+    );
+  }
+}
+
 extension UserDTOToUserModelMapper on UserDTO {
   UserModel toUserModel() {
     return UserModel(
