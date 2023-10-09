@@ -33,7 +33,8 @@ class SettingsPage extends StatelessWidget {
             child: BlocConsumer<SettingsCubit, SettingsState>(
               listenWhen: (oldState, newState) => (oldState.status != newState.status),
               buildWhen: (oldState, newState) {
-                return (oldState.isValid != newState.isValid) || newState.status.isInProgress;
+                return (oldState.isValid != newState.isValid) ||
+                    (oldState.status != newState.status);
               },
               listener: (context, state) {
                 if (state.status.isSuccess) Navigator.of(context).pop();
@@ -69,7 +70,9 @@ class _SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SettingsCubit, SettingsState>(
-      listenWhen: (oldState, newState) => newState.status.isFailure,
+      listenWhen: (oldState, newState) {
+        return newState.status.isFailure && (oldState.errorMessage != newState.errorMessage);
+      },
       listener: (context, state) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()

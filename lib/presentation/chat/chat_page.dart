@@ -166,12 +166,14 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
                             return const _UnreadMessageSeparator();
                           }
 
-                          late final isDaysEqual = messages[index - 1]
+                          late final isDaysEqual = messages[index + 1]
                               .dispatchTime
                               .equalsDay(messages[index].dispatchTime);
 
-                          if (index != 0 && !isDaysEqual) {
-                            return _DateOfYearSeparator(date: messages[index].dispatchTime);
+                          if (index != messages.length && !isDaysEqual) {
+                            return UnconstrainedBox(
+                              child: _DateOfYearSeparator(date: messages[index].dispatchTime),
+                            );
                           }
 
                           return const Divider(height: 0, color: Colors.transparent);
@@ -238,7 +240,7 @@ class _DateOfYearSeparator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: Colors.blue[300],
         borderRadius: BorderRadius.circular(16),

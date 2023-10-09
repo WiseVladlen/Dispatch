@@ -24,32 +24,36 @@ class CircleNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
-      child: CachedNetworkImage(
-        imageUrl: imagePath,
-        httpHeaders: HttpHeaders.baseHttpHeaders,
-        fit: BoxFit.cover,
-        width: radius * 2,
-        height: radius * 2,
-        placeholder: (_, __) => Container(
-          decoration: BoxDecoration(
-            color: placeholderColor,
-            shape: BoxShape.circle,
-          ),
-        ),
-        errorWidget: (_, __, ___) {
-          return Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: placeholderColor,
-              shape: BoxShape.circle,
+    return isNetworkImage(imagePath)
+        ? ClipOval(
+            child: CachedNetworkImage(
+              imageUrl: imagePath,
+              httpHeaders: HttpHeaders.baseHttpHeaders,
+              fit: BoxFit.cover,
+              width: radius * 2,
+              height: radius * 2,
+              placeholder: (_, __) => Container(
+                decoration: BoxDecoration(
+                  color: placeholderColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              errorWidget: (_, __, ___) => _buildPlaceholder(),
             ),
-            width: radius * 2,
-            height: radius * 2,
-            child: errorWidget.safeLet((it) => it()),
-          );
-        },
+          )
+        : _buildPlaceholder();
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: placeholderColor,
+        shape: BoxShape.circle,
       ),
+      width: radius * 2,
+      height: radius * 2,
+      child: errorWidget.safeLet((it) => it()),
     );
   }
 }

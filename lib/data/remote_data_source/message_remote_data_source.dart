@@ -75,5 +75,5 @@ class MessageRemoteDataSource {
   }
 
   /// Returns the user's message stream.
-  Stream<StandardMessageModel> get messageStream => _messageStreamController.stream;
+  Stream<StandardMessageModel> get messageStream => _messageStreamController.stream.distinct();
 }

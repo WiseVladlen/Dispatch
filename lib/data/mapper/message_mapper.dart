@@ -1,5 +1,4 @@
 import 'package:dispatch/data/dto/message_dto.dart';
-import 'package:dispatch/data/dto/user_dto.dart';
 import 'package:dispatch/data/mapper/user_mapper.dart';
 import 'package:dispatch/domain/model/message_model.dart';
 import 'package:dispatch/domain/model/user_model.dart';
@@ -43,7 +42,7 @@ extension MessageDTOToStandardMessageModelMapper on StandardMessageDTO {
       content: content.toMessageContent(),
       dispatchTime: DateTime.fromMillisecondsSinceEpoch(dispatchTime, isUtc: true),
       status: status.toMessageStatus(),
-      sender: (sender as UserDTO).toUserModel(),
+      sender: sender.toShortUserModel(),
       chatId: chatId,
     );
   }

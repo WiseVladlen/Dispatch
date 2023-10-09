@@ -4,6 +4,8 @@ import 'package:dispatch/domain/model/message_model.dart';
 abstract interface class IMessageRepository {
   abstract final Stream<StandardMessageModel> messageStream;
 
+  void subscribeMessageStream(String email);
+
   void sendMessage(SendMessageRequestModel messageRequestModel);
 
   Future<ChatMessagesModel> getChatMessages(String chatId, {int page = 0, int pageSize = 0});

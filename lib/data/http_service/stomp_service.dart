@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:dio/dio.dart';
 import 'package:dispatch/utils/http_utils.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
@@ -27,17 +26,9 @@ class StompService {
     return StompClient(
       config: StompConfig.sockJS(
         url: Uri(scheme: scheme, host: host, port: port, path: path).toString(),
-        stompConnectHeaders: HttpHeaders.build(contentType: Headers.jsonContentType),
-        //onConnect: (_) => onConnect(),
-        //onDisconnect: (_) => onDisconnect(),
-        onConnect: (frame) {
-          print('A stomp on connect :: ${frame.toString()}');
-          onConnect();
-        },
-        onDisconnect: (frame) {
-          print('A stomp on disconnect :: ${frame.toString()}');
-          onDisconnect();
-        },
+        stompConnectHeaders: HttpHeaders.baseHttpHeaders,
+        onConnect: (_) => onConnect(),
+        onDisconnect: (_) => onDisconnect(),
         onStompError: (frame) {
           print('A stomp error occurred in web socket connection :: ${frame.toString()}');
         },

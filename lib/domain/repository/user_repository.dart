@@ -9,7 +9,7 @@ abstract interface class IUserRepository {
 
   Future<void> updateName(String name);
   Future<void> updateImage(File imageFile);
-  Future<void> updatePersonalData(PersonalDataChecker checker);
+  Future<void> updatePersonalData(PersonalDataChecker data);
 
   Stream<UserModel> getUserStream({required String email});
   Future<List<UserModel>> getUsersByQuery(String query);

@@ -72,7 +72,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
 
-    final checker = PersonalDataChecker.fromStates(
+    final data = PersonalDataChecker.fromStates(
       inputDataModel: inputDataModel,
       outputDataModel: PersonalDataModel(
         name: state.name.value,
@@ -80,14 +80,14 @@ class SettingsCubit extends Cubit<SettingsState> {
       ),
     );
 
-    if (!checker.isNameChanged && !checker.isImagePathChanged) return;
+    if (!data.isNameChanged && !data.isImagePathChanged) return;
 
     try {
-      if (checker.isImagePathChanged) {
+      if (data.isImagePathChanged) {
         inputDataModel.imagePath.safeLet((path) => CachedNetworkImage.evictFromCache(path));
       }
 
-      await userRepository.updatePersonalData(checker);
+      await userRepository.updatePersonalData(data);
 
       state.imagePath.safeLet((it) => deleteImage(it));
 

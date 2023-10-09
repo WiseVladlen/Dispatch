@@ -36,7 +36,5 @@ class DioService {
 }
 
 extension DioExtension on Dio {
-  Dio setHeaders({String contentType = Headers.jsonContentType}) {
-    return this..options.headers = HttpHeaders.build(contentType: contentType);
-  }
+  Dio setHeaders() => this..options.headers = HttpHeaders.baseHttpHeaders;
 }

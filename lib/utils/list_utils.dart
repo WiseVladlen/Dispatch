@@ -9,28 +9,27 @@ extension ListExtension<E> on List<E> {
     bool Function(E element) test, {
     required (int index, E?) Function() orElse,
   }) {
-    var index = 0;
-    for (var element in this) {
+    for (var (index, element) in indexed) {
       if (test(element)) return (index, element);
-      index++;
     }
     return orElse();
   }
 
-  /// Iterates through the elements in search of the first element with the status [MessageStatus.sent],
-  /// that satisfies the parameters [email] and [messageContent].
+  /// Creates a new lazy Iterable with all elements that satisfy the predicate [test].
   ///
-  /// If such an element is found, it is map according to the [toElement] function,
-  /// otherwise the [orElse] function is executed.
+  /// The matching elements have the same order in the returned iterable as they have in iterator.
   ///
-  /// Returns a modified list.
-  List<E> mapWhere(
+  /// This method returns a view of the mapped elements modified by [toElement].
+  Iterable<E> mapWhere(
     bool Function(E element) test, {
     required E Function(E e) toElement,
-  }) {
-    for (var element in this) {
-      if (test(element)) toElement(element);
+  }) sync* {
+    for (var value in this) {
+      if (test(value)) {
+        yield toElement(value);
+        continue;
+      }
+      yield toElement(value);
     }
-    return this;
   }
 }

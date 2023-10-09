@@ -32,7 +32,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final IChatRepository chatRepository;
   final IMessageRepository messageRepository;
 
-  void _loadChatList(LoadChatListEvent event, Emitter<HomeState> emit) async {
+  Future<void> _loadChatList(LoadChatListEvent event, Emitter<HomeState> emit) async {
     emit(state.copyWith(chats: await chatRepository.chats));
   }
 
@@ -43,20 +43,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _getMessageChatEvent(GetMessageChatEvent event, Emitter<HomeState> emit) async {
-    final list = state.chats ?? [];
-    final (index, chatOrNull) = list.firstIndexedWhere(
+    final chats = state.chats ?? [];
+
+    final (index, chat) = chats.firstIndexedWhere(
       (element) => element.id == event.message.chatId,
       orElse: () => (-1, null),
     );
 
-    if (chatOrNull != null) {
-      emit(state.copyWith(
-        chats: list..[index].copyWith(lastMessage: event.message),
-      ));
-    } else {
-      final chat = await chatRepository.getChat(id: event.message.chatId);
-      emit(state.copyWith(chats: list..add(chat)));
-    }
+    final List<ChatModel> newChats = chat != null
+        ? (List.of(chats)..[index] = chat.copyWith(lastMessage: event.message))
+        : [...chats, await chatRepository.getChat(id: event.message.chatId)];
+
+    emit(
+      state.copyWith(
+        chats: newChats.sorted(
+          (a, b) => b.lastMessage.dispatchTime.compareTo(a.lastMessage.dispatchTime),
+        ),
+      ),
+    );
   }
 
   ChatModel? firstByEmailOrNull(String email) {

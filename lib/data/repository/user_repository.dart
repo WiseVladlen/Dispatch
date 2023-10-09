@@ -34,8 +34,8 @@ class UserRepository implements IUserRepository {
   }
 
   @override
-  Future<void> updatePersonalData(PersonalDataChecker checker) async {
-    final user = await remoteDataSource.updatePersonalData(checker);
+  Future<void> updatePersonalData(PersonalDataChecker data) async {
+    final user = await remoteDataSource.updatePersonalData(data);
     await localDataSource.updateUser(user);
   }
 

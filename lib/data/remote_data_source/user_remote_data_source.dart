@@ -32,7 +32,7 @@ class UserRemoteDataSource {
   Future<void> updateOnlineStatus({required bool isOnline}) async {
     final uri = DioService.buildUri(path: 'users/update-online-status');
     await DioService.cookieJar.loadForRequest(uri);
-    await DioService.dio.postUri(uri, data: {'online_status': isOnline});
+    await DioService.dio.setHeaders().postUri(uri, data: {'online_status': isOnline});
   }
 
   /// Updates the image of the current user to [imageFile].
@@ -50,8 +50,7 @@ class UserRemoteDataSource {
     });
 
     await DioService.cookieJar.loadForRequest(uri);
-    final dio = DioService.dio.setHeaders(contentType: Headers.multipartFormDataContentType);
-    final response = await dio.postUri(uri, data: formData);
+    final response = await DioService.dio.setHeaders().postUri(uri, data: formData);
     return UserDTO.fromJson(response.data as Map<String, dynamic>).toUserModel();
   }
 
@@ -61,7 +60,7 @@ class UserRemoteDataSource {
   Future<UserModel> updatePersonalData(PersonalDataChecker data) async {
     final uri = DioService.buildUri(path: 'users/update');
     await DioService.cookieJar.loadForRequest(uri);
-    final response = await DioService.dio.postUri(uri, data: await data.toFormData());
+    final response = await DioService.dio.setHeaders().postUri(uri, data: await data.toFormData());
     return UserDTO.fromJson(response.data).toUserModel();
   }
 
@@ -69,7 +68,7 @@ class UserRemoteDataSource {
   Future<List<UserModel>> getUsersByQuery(String query) async {
     final uri = DioService.buildUri(path: 'users', queryParameters: {'q': query});
     await DioService.cookieJar.loadForRequest(uri);
-    final response = await DioService.dio.getUri(uri);
+    final response = await DioService.dio.setHeaders().getUri(uri);
     return (response.data as List<dynamic>).map((e) => UserDTO.fromJson(e).toUserModel()).toList();
   }
 }

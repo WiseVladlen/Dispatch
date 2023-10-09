@@ -12,6 +12,9 @@ class MessageRepository implements IMessageRepository {
   Stream<StandardMessageModel> get messageStream => remoteDataSource.messageStream;
 
   @override
+  void subscribeMessageStream(String email) => remoteDataSource.subscribeMessageStream(email);
+
+  @override
   void sendMessage(SendMessageRequestModel messageRequestModel) {
     remoteDataSource.sendMessage(messageRequestModel: messageRequestModel);
   }

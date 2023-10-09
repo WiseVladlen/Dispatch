@@ -16,7 +16,9 @@ class LoginPage extends StatelessWidget {
         authenticationRepository: context.read<IAuthenticationRepository>(),
       ),
       child: BlocListener<LoginCubit, LoginState>(
-        listenWhen: (oldState, newState) => newState.status.isFailure,
+        listenWhen: (oldState, newState) {
+          return newState.status.isFailure && (oldState.errorMessage != newState.errorMessage);
+        },
         listener: (context, state) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()

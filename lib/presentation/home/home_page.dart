@@ -56,23 +56,23 @@ class _HomePageState extends State<HomePage> {
         body: BlocBuilder<HomeBloc, HomeState>(
           buildWhen: (oldState, newState) => (oldState.chats != newState.chats),
           builder: (context, state) {
-            final chatList = state.chats;
+            final chats = state.chats;
 
-            if (chatList == null) return const Center(child: CircularProgressIndicator());
+            if (chats == null) return const Center(child: CircularProgressIndicator());
 
-            if (chatList.isEmpty) return const Center(child: Text('No chats here yet'));
+            if (chats.isEmpty) return const Center(child: Text('No chats here yet'));
 
             return NotificationListener<UserScrollNotification>(
-              onNotification: (notification) {
-                context.read<HomeBloc>().add(ScrollDirectionChangedEvent(notification.direction));
+              onNotification: (value) {
+                context.read<HomeBloc>().add(ScrollDirectionChangedEvent(value.direction));
                 return true;
               },
               child: ListView.separated(
-                itemCount: chatList.length,
+                itemCount: chats.length,
                 itemBuilder: (_, index) {
                   return ChatTile(
-                    key: ValueKey(chatList[index].id),
-                    chat: chatList[index],
+                    key: ValueKey(chats[index].id),
+                    chat: chats[index],
                   );
                 },
                 separatorBuilder: (_, __) => const Divider(height: 1),
@@ -183,6 +183,8 @@ class _DrawerPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
+                  fadeOutDuration: const Duration(milliseconds: 500),
+                  fadeInDuration: const Duration(milliseconds: 500),
                 ),
                 Positioned(
                   left: 16,

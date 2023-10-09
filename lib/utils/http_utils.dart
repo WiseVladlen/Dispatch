@@ -10,19 +10,14 @@ class HttpHeaders {
   static const authorizationHeader = 'Authorization';
   static const setCookieHeader = 'Set-Cookie';
 
-  static Map<String, String> build({required String contentType}) {
-    //return {contentTypeHeader: contentType, ...baseHttpHeaders};
-    return baseHttpHeaders;
-  }
-
   static Map<String, String> get baseHttpHeaders {
     return {authorizationHeader: CacheStorage().readAccessToken() ?? ''};
   }
 }
 
 Future<void> saveCookieFromResponse(Uri uri, Response<dynamic> response) async {
-  response.headers[HttpHeaders.setCookieHeader].safeLet((cookies) {
-    DioService.cookieJar.saveFromResponse(
+  await response.headers[HttpHeaders.setCookieHeader].safeLet((cookies) async {
+    await DioService.cookieJar.saveFromResponse(
       uri,
       cookies.map((e) => Cookie.fromSetCookieValue(e)).toList(),
     );
