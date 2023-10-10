@@ -9,7 +9,7 @@ import 'package:dispatch/presentation/chat/message_tile.dart';
 import 'package:dispatch/presentation/chat/view_model/chat_view_model.dart';
 import 'package:dispatch/utils/date_utils.dart';
 import 'package:dispatch/utils/delayed_action.dart';
-import 'package:dispatch/utils/message_list_utils.dart';
+import 'package:dispatch/utils/message_utils.dart';
 import 'package:dispatch/utils/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -23,8 +23,7 @@ class ChatArguments {
   final ChatViewModel chat;
 }
 
-@immutable
-class ChatPage extends StatefulWidget {
+class ChatPage extends StatelessWidget {
   const ChatPage({super.key, required this.args});
 
   final ChatArguments args;
@@ -32,30 +31,11 @@ class ChatPage extends StatefulWidget {
   static const path = '/chat';
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin {
-  late final _itemScrollController = ItemScrollController();
-
-  late final AnimationController _animationController = AnimationController(
-    duration: const Duration(milliseconds: 250),
-    vsync: this,
-  );
-
-  late final Animation<double> _animation = CurvedAnimation(
-    parent: _animationController,
-    curve: Curves.linear,
-  );
-
-  @override
   Widget build(BuildContext context) {
-    String? initialUnreadMessageId;
-
     return BlocProvider(
       create: (_) => ChatBloc(
-        chatId: widget.args.chat.id,
-        email: widget.args.chat.email,
+        chatId: args.chat.id,
+        email: args.chat.email,
         sender: context.read<UserCubit>().state.user,
         chatRepository: context.read<IChatRepository>(),
         messageRepository: context.read<IMessageRepository>(),
@@ -69,133 +49,164 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
             contentPadding: EdgeInsets.zero,
             horizontalTitleGap: 12,
             leading: CircleNetworkImage(
-              imagePath: widget.args.chat.imagePath ?? '',
+              imagePath: args.chat.imagePath ?? '',
               radius: 20,
               errorWidget: () => Text(
-                widget.args.chat.title[0].toUpperCase(),
+                args.chat.title[0].toUpperCase(),
                 style: Theme.of(context).textTheme.displayMedium,
               ),
               placeholderColor: Theme.of(context).cardColor,
             ),
             title: Text(
-              widget.args.chat.title,
+              args.chat.title,
               style: TextStyles.titleLarge,
             ),
             subtitle: Text(
-              widget.args.chat.subtitle,
+              args.chat.subtitle,
               style: TextStyles.titleMedium,
             ),
             splashColor: Colors.transparent,
           ),
         ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: BlocBuilder<ChatBloc, ChatState>(
-                  buildWhen: (oldState, newState) => (oldState.messages != newState.messages),
-                  builder: (context, state) {
-                    final messages = state.messages;
-                    final user = context.read<UserCubit>().state.user;
-
-                    if (messages == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (messages.isEmpty) {
-                      return const Center(child: Text('No messages here yet'));
-                    }
-
-                    _animationController.forward();
-
-                    SchedulerBinding.instance.addPostFrameCallback((_) {
-                      final (index, message) = messages.firstIndexedUnreadMessage(
-                        email: user.email,
-                        orElse: () => (-1, null),
-                      );
-
-                      if (message == null) {
-                        initialUnreadMessageId = null;
-                        scrollTo(0, alignment: 0);
-                        return;
-                      }
-
-                      initialUnreadMessageId = message.id;
-
-                      scrollTo(index - 1);
-                    });
-
-                    return FadeTransition(
-                      opacity: _animation,
-                      child: ScrollablePositionedList.separated(
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final message = messages[index];
-
-                          Widget buildMessageTile({Key? key, required bool isSentByMe}) {
-                            return MessageTile(
-                              key: key,
-                              message: message,
-                              isSentByMe: isSentByMe,
-                            );
-                          }
-
-                          if (message.sender.email != user.email && message.status.isDelivered) {
-                            return VisibilityDetector(
-                              key: ValueKey(message.id),
-                              child: buildMessageTile(isSentByMe: false),
-                              onVisibilityChanged: (info) {
-                                if (info.visibleFraction == 1) {
-                                  context.read<ChatBloc>().add(QueueMessageForReading(message.id));
-
-                                  DelayedAction.run(() {
-                                    context.read<ChatBloc>().add(ReadMessages());
-                                  });
-                                }
-                              },
-                            );
-                          }
-
-                          return buildMessageTile(
-                            key: ValueKey(message.id),
-                            isSentByMe: message.sender.email == user.email,
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          if (messages[index].id == initialUnreadMessageId) {
-                            return const _UnreadMessageSeparator();
-                          }
-
-                          late final isDaysEqual = messages[index + 1]
-                              .dispatchTime
-                              .equalsDay(messages[index].dispatchTime);
-
-                          if (index != messages.length && !isDaysEqual) {
-                            return UnconstrainedBox(
-                              child: _DateOfYearSeparator(date: messages[index].dispatchTime),
-                            );
-                          }
-
-                          return const Divider(height: 0, color: Colors.transparent);
-                        },
-                        reverse: true,
-                        itemScrollController: _itemScrollController,
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              PhysicalModel(
-                color: Theme.of(context).colorScheme.surface,
-                elevation: 8,
-                child: const _MessageInput(),
-              ),
-            ],
-          ),
+        body: const SafeArea(
+          child: _ChatPageBody(),
         ),
       ),
+    );
+  }
+}
+
+@immutable
+class _ChatPageBody extends StatefulWidget {
+  const _ChatPageBody();
+
+  @override
+  State<_ChatPageBody> createState() => _ChatPageBodyState();
+}
+
+class _ChatPageBodyState extends State<_ChatPageBody> with SingleTickerProviderStateMixin {
+  late final _itemScrollController = ItemScrollController();
+
+  late final AnimationController _animationController = AnimationController(
+    duration: const Duration(milliseconds: 250),
+    vsync: this,
+  );
+
+  late final Animation<double> _opacityAnimation = CurvedAnimation(
+    parent: _animationController,
+    curve: Curves.linear,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    String? initialUnreadMessageId;
+
+    return Column(
+      children: [
+        Expanded(
+          child: BlocBuilder<ChatBloc, ChatState>(
+            buildWhen: (oldState, newState) => (oldState.messages != newState.messages),
+            builder: (context, state) {
+              final messages = state.messages;
+              final user = context.read<UserCubit>().state.user;
+
+              if (messages == null) return const Center(child: CircularProgressIndicator());
+
+              if (messages.isEmpty) return const Center(child: Text('No messages here yet'));
+
+              _animationController.forward();
+
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                final (index, message) = messages.firstIndexedUnreadMessage(
+                  email: user.email,
+                  orElse: () => (-1, null),
+                );
+
+                if (message == null) {
+                  initialUnreadMessageId = null;
+                  scrollTo(0, alignment: 0);
+                  return;
+                }
+
+                initialUnreadMessageId = message.id;
+
+                scrollTo(index - 1);
+              });
+
+              return FadeTransition(
+                opacity: _opacityAnimation,
+                child: ScrollablePositionedList.separated(
+                  itemCount: messages.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == messages.length) return const SizedBox.shrink();
+
+                    final message = messages[index];
+
+                    Widget buildMessageTile({Key? key, required bool isSentByMe}) {
+                      return MessageTile(
+                        key: key,
+                        message: message,
+                        isSentByMe: isSentByMe,
+                      );
+                    }
+
+                    if (message.sender.email != user.email && message.status.isDelivered) {
+                      return VisibilityDetector(
+                        key: ValueKey(message.id),
+                        child: buildMessageTile(isSentByMe: false),
+                        onVisibilityChanged: (info) {
+                          if (info.visibleFraction == 1) {
+                            context.read<ChatBloc>().add(QueueMessageForReading(message.id));
+
+                            DelayedAction.run(() {
+                              context.read<ChatBloc>().add(ReadMessages());
+                            });
+                          }
+                        },
+                      );
+                    }
+
+                    return buildMessageTile(
+                      key: ValueKey(message.id),
+                      isSentByMe: message.sender.email == user.email,
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    if (index == messages.length - 1) {
+                      return UnconstrainedBox(
+                        child: _DateOfYearSeparator(date: messages.last.dispatchTime),
+                      );
+                    }
+
+                    if (messages[index].id == initialUnreadMessageId) {
+                      return const _UnreadMessageSeparator();
+                    }
+
+                    late final isDaysEqual = messages[index + 1].dayEquals(messages[index]);
+
+                    if (index != messages.length - 1 && !isDaysEqual) {
+                      return UnconstrainedBox(
+                        child: _DateOfYearSeparator(date: messages[index].dispatchTime),
+                      );
+                    }
+
+                    return const SizedBox.shrink();
+                  },
+                  reverse: true,
+                  itemScrollController: _itemScrollController,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                ),
+              );
+            },
+          ),
+        ),
+        PhysicalModel(
+          color: Theme.of(context).colorScheme.surface,
+          elevation: 8,
+          child: const _MessageInput(),
+        ),
+      ],
     );
   }
 
@@ -210,7 +221,6 @@ class _ChatPageState extends State<ChatPage> with SingleTickerProviderStateMixin
   }
 }
 
-@immutable
 class _UnreadMessageSeparator extends StatelessWidget {
   const _UnreadMessageSeparator();
 

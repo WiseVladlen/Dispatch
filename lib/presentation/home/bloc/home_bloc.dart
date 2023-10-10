@@ -8,6 +8,7 @@ import 'package:dispatch/domain/repository/message_repository.dart';
 import 'package:dispatch/presentation/home/bloc/home_event.dart';
 import 'package:dispatch/presentation/home/bloc/home_state.dart';
 import 'package:dispatch/utils/list_utils.dart';
+import 'package:dispatch/utils/message_utils.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -54,13 +55,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ? (List.of(chats)..[index] = chat.copyWith(lastMessage: event.message))
         : [...chats, await chatRepository.getChat(id: event.message.chatId)];
 
-    emit(
-      state.copyWith(
-        chats: newChats.sorted(
-          (a, b) => b.lastMessage.dispatchTime.compareTo(a.lastMessage.dispatchTime),
-        ),
-      ),
-    );
+    emit(state.copyWith(
+      chats: newChats.sorted((a, b) => b.lastMessage.compareDateTo(a.lastMessage)),
+    ));
   }
 
   ChatModel? firstByEmailOrNull(String email) {

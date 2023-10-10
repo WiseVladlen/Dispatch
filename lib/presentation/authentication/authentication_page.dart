@@ -5,8 +5,6 @@ import 'package:dispatch/utils/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-//height: (MediaQuery.of(context).size.height - 28) * (1 / 3),
-
 class AuthenticationPage extends StatelessWidget {
   const AuthenticationPage({super.key});
 

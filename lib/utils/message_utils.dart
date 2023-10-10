@@ -24,3 +24,9 @@ extension MessageListExtension<E extends ShortMessageModel> on List<E> {
     return orElse();
   }
 }
+
+extension MessageExtension<T extends ShortMessageModel> on T {
+  bool dayEquals(T message) => dispatchTime.day == message.dispatchTime.day;
+
+  int compareDateTo(T message) => dispatchTime.compareTo(message.dispatchTime);
+}

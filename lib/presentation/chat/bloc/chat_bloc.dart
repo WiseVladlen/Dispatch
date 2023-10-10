@@ -75,17 +75,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       messages: [message, ...?state.messages],
     ));
 
-/*    Future.microtask(() async {
-      messageRepository.sendMessage(
-        SendMessageRequestModel(
-          chatId: chatId ??= await chatRepository.createChat(
-            participants: [email ?? proxyUser.email],
-          ),
-          messageContent: message.content.text,
-        ),
-      );
-    });*/
-
     Future.microtask(() async {
       switch ((chatId, email)) {
         case (String? chatId, String email):

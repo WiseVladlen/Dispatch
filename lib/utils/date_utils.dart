@@ -36,6 +36,4 @@ extension TimeExtension on DateTime {
       return 'offline for a long time';
     }
   }
-
-  bool equalsDay(DateTime date) => day == date.day;
 }
